@@ -1,14 +1,9 @@
-from flask import Flask
+import asyncio
 from Game import Game
-
 
 game = Game()
 
-
-app = Flask(__name__)
-
-@app.route("/")
-def index():
+async def main():
     game.play()
 
-app.run(host = "127.0.0.1", port = 8080, debug = True)
+asyncio.run(main())
