@@ -22,6 +22,8 @@ class Player:
     
     def move(self, dt):
         keys = pygame.key.get_pressed()
+        
+            
         if keys[pygame.K_w] and (self.pos.y - (self.speed * dt) > self.radius):
             self.pos.y -= self.speed * dt
         if keys[pygame.K_s] and (self.pos.y + (self.speed * dt) < self.height - self.radius):
