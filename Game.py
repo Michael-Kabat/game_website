@@ -55,11 +55,14 @@ class Game:
             self.screen.fill("dark grey")
 
             if self.state == "PAUSED":
+                pygame.mouse.set_visible(True)
                 resume_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
                                                   140, 40, font, "light grey")
-                resume_button.draw()
-                if resume_button.click():
-                    self.state == "RUNNING"
+                resume_button.draw("Resume")
+
+                if resume_button.click() and self.mouse_down:
+                    self.state = "RUNNING"
+                    
 
             if self.state == "OPTIONS":
                 pygame.mouse.set_visible(True)
@@ -237,3 +240,5 @@ class Game:
         pygame.quit()
 
 
+game = Game()
+game.play()

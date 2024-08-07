@@ -24,5 +24,6 @@ class Button:
         mouse = pygame.mouse.get_pos()
         if (mouse[0] < self.center[0] + (self.width / 2)) and (mouse[0] > self.center[0] - (self.width / 2)):
             if (mouse[1] < self.center[1] + (self.height / 2)) and (mouse[1] > self.center[1] - (self.height / 2)):
+                
                 return True
         return False
