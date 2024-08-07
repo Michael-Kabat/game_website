@@ -1,4 +1,5 @@
 import json
+import asyncio
 import sys
 import pygame
 from Apple import Apple
@@ -371,5 +372,3 @@ class Game:
             await asyncio.sleep(0)
 
         pygame.quit()
-game = Game()
-game.play()
