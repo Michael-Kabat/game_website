@@ -130,9 +130,12 @@ class Game:
 
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
+                
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_q]:
+                if keys[pygame.K_ESCAPE]:
                     self.state = "PAUSED"
+
+
                 # hide the mouse
                 pygame.mouse.set_visible(False)
                 
