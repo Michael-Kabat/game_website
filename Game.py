@@ -1,9 +1,12 @@
+import json
+import sys
 import pygame
-import asyncio
 from Apple import Apple
 from Ghost import Ghost
 from Player import Player
 from Button import Button
+
+DIFFICULTY_CONVERTER = {300: "Easy", 450: "Medium", 600: "Hard"}
 
 class Game:
     
@@ -21,7 +24,10 @@ class Game:
         self.hard = 600
         self.medium = 450
         self.easy = 300
-        
+        self.easy_high_score = 0
+        self.medium_high_score = 0
+        self.hard_high_score = 0
+        self.name = ''
         
 
 
@@ -32,9 +38,12 @@ class Game:
         self.mouse_down = False
 
     
-    async def play(self):
-   
+    #async def play(self):
+    def play(self):
         # variable inits
+        leaderboard = []
+        
+
         self.screen = pygame.display.set_mode((1280, 720))
         player = Player(self.screen, 30, 375)
         font = pygame.font.Font('freesansbold.ttf', 28)
@@ -46,9 +55,12 @@ class Game:
         resume_color = "grey"
         quit_color = "grey"
         play_color = "grey"
+        name_text_color = "grey"
         exit_color = "grey"
+        user_input = "Name: "
         dt = 0
         background_color = "grey"
+        typing = False
         # Game Loop
         while self.running:
             # poll for events
@@ -57,14 +69,25 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN: 
                     self.mouse_down = True
+
+                if event.type == pygame.KEYDOWN:
+                    if typing:
+                        if user_input == "Name: ":
+                            user_input = ''
+                            
+                        if event.key == pygame.K_BACKSPACE:
+                            user_input = user_input[:-1]
+                        else:
+                            user_input += event.unicode
 
             self.screen.fill(background_color)
 
             if self.state == "MENU":
                 pygame.mouse.set_visible(True)
-                play_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 - 25), 
+                play_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 - 50), 
                                      140, 40, font, play_color)
                 
                 play_button.draw('Play')
@@ -74,10 +97,29 @@ class Game:
                     if self.mouse_down:
                         self.state = "OPTIONS"
                         self.mouse_down = False
+                        self.name = user_input
                 else:
                     play_color = "dark grey"                
                 
-                exit_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
+
+                name_text = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
+                                     140, 40, font, name_text_color)
+                
+
+                name_text.draw(user_input)
+
+                if name_text.click():
+                    name_text_color = "light grey"
+                    if self.mouse_down:
+                        typing = True
+                else:
+                    if self.mouse_down:
+                        typing = False
+                    name_text_color = "dark grey"
+
+
+
+                exit_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 50), 
                                      140, 40, font, exit_color)
                 exit_button.draw("Quit")
                 
@@ -143,6 +185,11 @@ class Game:
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.easy
                         self.mouse_down = False
+                        try:
+                            with open('easy_leaderboard.json', 'r') as l:
+                                leaderboard = json.load(l)
+                        except:
+                            pass
                 else:
                     easy_color = "dark red"
                         
@@ -159,6 +206,12 @@ class Game:
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.medium
                         self.mouse_down = False
+                        try:
+                            with open('medium_leaderboard.json', 'r') as t:
+                                leaderboard = json.load(t)
+                                print("leaderboard is medium ")
+                        except:
+                            pass
                         
                 else:
                     medium_color = "dark red"
@@ -174,10 +227,14 @@ class Game:
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.hard
                         self.mouse_down = False
+                        try:
+                            with open('hard_leaderboard.json', 'r') as f:
+                                leaderboard = json.load(f)
+                        except:
+                            pass
                 else:
                     hard_color = "dark red"
-
-            
+                
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
                 
@@ -205,6 +262,30 @@ class Game:
                     ghost.ghost_boundries()
                    
                     if ghost.state:
+                        #if self.score > leaderboard[-1]['score'] if leaderboard else self.score > 0:
+                        name_found = False
+                        for i in range(len(leaderboard)):
+                            
+                            if self.name == leaderboard[i]["name"]:
+                                name_found = True
+                                if self.score > leaderboard[i]["score"]:
+                                    leaderboard[i] = ({'name': self.name, "Difficulty": DIFFICULTY_CONVERTER[self.difficulty], 'score': self.score})
+                                    leaderboard.sort(key=lambda x: x['score'], reverse=True)
+                                #leaderboard = leaderboard[:5]
+                        if not name_found:
+                            leaderboard.append({'name': self.name, "Difficulty": DIFFICULTY_CONVERTER[self.difficulty], 'score': self.score})
+                        
+                        file_name = ''
+                        if self.difficulty == self.easy:
+                            file_name = "easy_leaderboard.json"
+                        if self.difficulty == self.medium:
+                            file_name = "medium_leaderboard.json"
+                        if self.difficulty == self.hard:
+                            file_name = "hard_leaderboard.json"
+
+                        with open(file_name, 'w') as f:
+                            json.dump(leaderboard, f)
+
                         self.state = 'GAME OVER'
                 
 
@@ -247,10 +328,17 @@ class Game:
                 dt = self.clock.tick(60) / 1000
 
             if self.state == "GAME OVER":
-                pygame.mouse.set_visible(True)
-                mouse = pygame.mouse.get_pos()
-                
-                
+                pygame.mouse.set_visible(True)   
+
+                leaderboard_text = ''
+                for i, entry in enumerate(leaderboard):
+                    if i <= 5:
+                        leaderboard_text += f'{i + 1}. {entry["name"]}: {entry["score"]} on {entry["Difficulty"]}, '
+                leaderboard_text = leaderboard_text.rstrip()
+                leaderboard_rect = self.screen.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height()/ 2))
+                leaderboard_surface = font.render(leaderboard_text, True, (0,0,0))
+                self.screen.blit(leaderboard_surface, leaderboard_rect)
+
                 retry_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
                                                   140, 40, font, retry_color)
                 retry_button.draw("Retry")
@@ -277,8 +365,12 @@ class Game:
                 else:
                     difficulty_color = "dark grey"
 
+
+
         # flip() the display to put your work on screen  
             pygame.display.flip()
-            await asyncio.sleep(0)
+            # await asyncio.sleep(0)
 
         pygame.quit()
+game = Game()
+game.play()
