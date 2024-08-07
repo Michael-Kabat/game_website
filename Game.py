@@ -33,15 +33,21 @@ class Game:
 
     
     async def play(self):
+        # variable inits
         self.screen = pygame.display.set_mode((1280, 720))
         player = Player(self.screen, 30, 375)
         font = pygame.font.Font('freesansbold.ttf', 28)
         easy_color = "dark red"
         medium_color = "dark red"
         hard_color = "dark red"
-        difficulty_color = "grey"
+        difficulty_color = "dark grey"
+        retry_color = "dark grey"
+        resume_color = "grey"
+        quit_color = "grey"
+        play_color = "grey"
         dt = 0
-
+        background_color = "grey"
+        # Game Loop
         while self.running:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
@@ -52,21 +58,41 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouse_down = True
 
-            self.screen.fill("dark grey")
+            self.screen.fill(background_color)
 
             if self.state == "PAUSED":
                 pygame.mouse.set_visible(True)
-                resume_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
-                                                  140, 40, font, "light grey")
+                player.draw()
+                for ghost in self.ghost_list:
+                    ghost.draw_ghost()
+                for apple in self.apple_list:
+                        apple.draw_apple()
+
+
+                resume_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 - 25), 
+                                                  140, 40, font, resume_color)
                 resume_button.draw("Resume")
 
-                if resume_button.click() and self.mouse_down:
-                    self.state = "RUNNING"
-                    
+                if resume_button.click():
+                    resume_color = "light grey"
+                    if self.mouse_down:
+                        self.state = "RUNNING"
+                        background_color = "grey"
+                else:
+                    resume_color = "grey"
+                quit_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
+                                                  140, 40, font, quit_color)
+                quit_button.draw("Quit")
 
+                if quit_button.click():
+                    quit_color = "light grey"
+                    if self.mouse_down:
+                        self.running = False
+                else: 
+                    quit_color = "grey"
+                    
             if self.state == "OPTIONS":
                 pygame.mouse.set_visible(True)
-                mouse = pygame.mouse.get_pos()
 
                 # EASY
                 
@@ -113,31 +139,25 @@ class Game:
 
             if self.state == "MENU":
                 pygame.mouse.set_visible(True)
-                mouse = pygame.mouse.get_pos()
-                color = "grey"
+                play_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
+                                     140, 40, font, play_color)
                 
-                if (mouse[0] > self.screen.get_width() / 2 - 70) and mouse[0] < self.screen.get_width() / 2 + 70:
-                    if mouse[1] > self.screen.get_height() / 2 and mouse[1] < self.screen.get_height() / 2 + 40:
-                        color = "light grey"
-                    
-                        if self.mouse_down:
-                            self.state = 'OPTIONS'                        
-
-                retry_button = pygame.draw.rect(self.screen, color, [self.screen.get_width()/2 - 70,self.screen.get_height()/2,
-                                                                     140,40])
-                text = font.render("Play", True, (0, 0, 0))
-                textRect = text.get_rect()
+                play_button.draw('Play')
                 
-                textRect.center = (self.screen.get_width()/2,self.screen.get_height()/2 + 20)
-                self.screen.blit(text, textRect)
-
+                if play_button.click():
+                    play_color = "light grey"
+                    if self.mouse_down:
+                        self.state = "OPTIONS"
+                else:
+                    play_color = "dark grey"                
+                
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
                 
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_ESCAPE]:
                     self.state = "PAUSED"
-
+                    background_color = "dark grey"
 
                 # hide the mouse
                 pygame.mouse.set_visible(False)
@@ -202,26 +222,21 @@ class Game:
             if self.state == "GAME OVER":
                 pygame.mouse.set_visible(True)
                 mouse = pygame.mouse.get_pos()
-                color = "grey"
                 
-
-                if (mouse[0] > self.screen.get_width() / 2 - 70) and mouse[0] < self.screen.get_width() / 2 + 70:
-                    if mouse[1] > self.screen.get_height() / 2 and mouse[1] < self.screen.get_height() / 2 + 40:
-                        color = "light grey"
-                    
-                        if self.mouse_down:
-                            self.state = 'RUNNING'
-                            self.setup_and_reset()
-                            player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
-                            
-
-                retry_button = pygame.draw.rect(self.screen, color, [self.screen.get_width()/2 - 70, self.screen.get_height()/2, 
-                                                                     140,40])
-                text = font.render("Retry", True, (0, 0, 0))
-                textRect = text.get_rect()
                 
-                textRect.center = (self.screen.get_width()/2, self.screen.get_height()/2 + 20)
-                self.screen.blit(text, textRect)
+                retry_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
+                                                  140, 40, font, retry_color)
+                retry_button.draw("Retry")
+
+                if retry_button.click():
+                    retry_color = "light grey"
+                    if self.mouse_down:    
+                        self.state = 'RUNNING'
+                        self.setup_and_reset()
+                        player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
+                else:
+                    retry_color = "dark grey"
+                        
 
                 change_difficulty_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 - 25), 
                                                   140, 40, font, difficulty_color)
@@ -231,7 +246,7 @@ class Game:
                     if self.mouse_down:
                         self.state = "OPTIONS"
                 else:
-                    difficulty_color = "grey"
+                    difficulty_color = "dark grey"
 
         # flip() the display to put your work on screen  
             pygame.display.flip()
