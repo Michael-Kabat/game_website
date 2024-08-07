@@ -1,4 +1,5 @@
 import pygame
+import asyncio
 from Apple import Apple
 from Ghost import Ghost
 from Player import Player
@@ -31,7 +32,7 @@ class Game:
         self.mouse_down = False
 
     
-    def play(self):
+    async def play(self):
         self.screen = pygame.display.set_mode((1280, 720))
         player = Player(self.screen, 30, 375)
         font = pygame.font.Font('freesansbold.ttf', 28)
@@ -219,5 +220,6 @@ class Game:
 
         # flip() the display to put your work on screen  
             pygame.display.flip()
+            await asyncio.sleep(0)
 
         pygame.quit()
