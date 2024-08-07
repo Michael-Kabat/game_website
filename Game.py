@@ -54,6 +54,13 @@ class Game:
 
             self.screen.fill("dark grey")
 
+            if self.state == "PAUSED":
+                resume_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
+                                                  140, 40, font, "light grey")
+                resume_button.draw()
+                if resume_button.click():
+                    self.state == "RUNNING"
+
             if self.state == "OPTIONS":
                 pygame.mouse.set_visible(True)
                 mouse = pygame.mouse.get_pos()
@@ -123,7 +130,9 @@ class Game:
 
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
-                
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_q]:
+                    self.state = "PAUSED"
                 # hide the mouse
                 pygame.mouse.set_visible(False)
                 
@@ -223,3 +232,5 @@ class Game:
             await asyncio.sleep(0)
 
         pygame.quit()
+
+
