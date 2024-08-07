@@ -38,8 +38,8 @@ class Game:
         self.mouse_down = False
 
     
-    #async def play(self):
-    def play(self):
+    async def play(self):
+    # def play(self):
         # variable inits
         leaderboard = []
         
@@ -209,7 +209,6 @@ class Game:
                         try:
                             with open('medium_leaderboard.json', 'r') as t:
                                 leaderboard = json.load(t)
-                                print("leaderboard is medium ")
                         except:
                             pass
                         
@@ -369,7 +368,7 @@ class Game:
 
         # flip() the display to put your work on screen  
             pygame.display.flip()
-            # await asyncio.sleep(0)
+            await asyncio.sleep(0)
 
         pygame.quit()
 game = Game()
