@@ -33,6 +33,7 @@ class Game:
 
     
     async def play(self):
+   
         # variable inits
         self.screen = pygame.display.set_mode((1280, 720))
         player = Player(self.screen, 30, 375)
@@ -45,6 +46,7 @@ class Game:
         resume_color = "grey"
         quit_color = "grey"
         play_color = "grey"
+        exit_color = "grey"
         dt = 0
         background_color = "grey"
         # Game Loop
@@ -59,6 +61,33 @@ class Game:
                     self.mouse_down = True
 
             self.screen.fill(background_color)
+
+            if self.state == "MENU":
+                pygame.mouse.set_visible(True)
+                play_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 - 25), 
+                                     140, 40, font, play_color)
+                
+                play_button.draw('Play')
+                
+                if play_button.click():
+                    play_color = "light grey"
+                    if self.mouse_down:
+                        self.state = "OPTIONS"
+                        self.mouse_down = False
+                else:
+                    play_color = "dark grey"                
+                
+                exit_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
+                                     140, 40, font, exit_color)
+                exit_button.draw("Quit")
+                
+                if exit_button.click():
+                    exit_color = "light grey"
+                    if self.mouse_down:
+                        self.state = "QUIT"
+                        self.mouse_down = False
+                else:
+                    exit_color = "dark grey"
 
             if self.state == "PAUSED":
                 pygame.mouse.set_visible(True)
@@ -78,19 +107,27 @@ class Game:
                     if self.mouse_down:
                         self.state = "RUNNING"
                         background_color = "grey"
+                        self.mouse_down = False
                 else:
                     resume_color = "grey"
+
                 quit_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2 + 25), 
                                                   140, 40, font, quit_color)
-                quit_button.draw("Quit")
+                quit_button.draw("Menu")
 
                 if quit_button.click():
                     quit_color = "light grey"
                     if self.mouse_down:
-                        self.running = False
+                        self.state = "MENU"
+                        background_color = "grey"
+                        self.mouse_down = False
                 else: 
                     quit_color = "grey"
-                    
+            
+            if self.state == "QUIT":
+                 self.screen.fill("black")
+                 self.running = False
+
             if self.state == "OPTIONS":
                 pygame.mouse.set_visible(True)
 
@@ -105,6 +142,7 @@ class Game:
                         self.state = "RUNNING"
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.easy
+                        self.mouse_down = False
                 else:
                     easy_color = "dark red"
                         
@@ -120,6 +158,7 @@ class Game:
                         self.setup_and_reset()
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.medium
+                        self.mouse_down = False
                         
                 else:
                     medium_color = "dark red"
@@ -134,23 +173,11 @@ class Game:
                         self.setup_and_reset()
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
                         self.difficulty = self.hard
+                        self.mouse_down = False
                 else:
                     hard_color = "dark red"
 
-            if self.state == "MENU":
-                pygame.mouse.set_visible(True)
-                play_button = Button(self.screen, (self.screen.get_width() / 2, self.screen.get_height() / 2), 
-                                     140, 40, font, play_color)
-                
-                play_button.draw('Play')
-                
-                if play_button.click():
-                    play_color = "light grey"
-                    if self.mouse_down:
-                        self.state = "OPTIONS"
-                else:
-                    play_color = "dark grey"                
-                
+            
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
                 
@@ -234,6 +261,7 @@ class Game:
                         self.state = 'RUNNING'
                         self.setup_and_reset()
                         player.pos = pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
+                        self.mouse_down = False
                 else:
                     retry_color = "dark grey"
                         
@@ -245,6 +273,7 @@ class Game:
                     difficulty_color = "light grey"
                     if self.mouse_down:
                         self.state = "OPTIONS"
+                        self.mouse_down = False
                 else:
                     difficulty_color = "dark grey"
 
@@ -253,7 +282,3 @@ class Game:
             await asyncio.sleep(0)
 
         pygame.quit()
-
-
-game = Game()
-game.play()

@@ -11,10 +11,10 @@ class Ghost:
         self.state = False
         self.velocity : Vector2 = Vector2(random.randint(-speed, speed), random.randint(-speed, speed))
         rand_x = self.random_exclusion(self.radius * 2, self.screen.get_width() - self.radius * 2, 
-                                       [x for x in range(int(player_pos.x - 50), int(player_pos.x + 50))])
+                                       [x for x in range(int(player_pos.x - 75), int(player_pos.x + 75))])
         
         rand_y = self.random_exclusion(self.radius * 2, self.screen.get_height() - self.radius * 2, 
-                                        [x for x in range(int(player_pos.y - 50), int(player_pos.y + 50))])
+                                        [x for x in range(int(player_pos.y - 75), int(player_pos.y + 75))])
                                         
         self.pos : Vector2 = pygame.Vector2(rand_x, rand_y)
         
