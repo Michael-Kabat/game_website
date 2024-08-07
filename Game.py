@@ -60,7 +60,7 @@ class Game:
         exit_color = "grey"
         user_input = "Name: "
         dt = 0
-        background_color = "grey"
+        background_color = "white"
         typing = False
         # Game Loop
         while self.running:
@@ -372,3 +372,4 @@ class Game:
             await asyncio.sleep(0)
 
         pygame.quit()
+
