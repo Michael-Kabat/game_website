@@ -149,7 +149,7 @@ class Game:
                     resume_color = "light grey"
                     if self.mouse_down:
                         self.state = "RUNNING"
-                        background_color = "grey"
+                        background_color = "white"
                         self.mouse_down = False
                 else:
                     resume_color = "grey"
@@ -237,7 +237,7 @@ class Game:
                 
             if self.state == 'RUNNING':
             # fill the screen with a color to wipe away anything from last frame
-                
+                typing = False
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_ESCAPE]:
                     self.state = "PAUSED"
